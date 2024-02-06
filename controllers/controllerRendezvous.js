@@ -58,7 +58,7 @@ const priseDeRendezvous = async function(request, response) {
         };
 
         const result = await createDocument('rendezvous', data);
-        res.status(200).json({
+        response.status(200).json({
             success: true,
             message: 'Prise de rendez-vous avec succès',
             professionalId: result.insertedId
@@ -66,7 +66,7 @@ const priseDeRendezvous = async function(request, response) {
         
     } catch (error) {
         console.error('Erreur lors de l\'insertion de la prise de rendez-vous :', error);
-        res.status(500).json({
+        response.status(500).json({
             success: false,
             message: 'Une erreur s\'est produite lors de la prise de rendez-vous.'
         });
