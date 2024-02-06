@@ -27,11 +27,15 @@ const listeRendezvousClients = async function(request, response) {
 };
 
 const listeRendezvousEmployes = async function(request, response) {
-    const { idemployes } = request.body;
+    const { idemploye } = request.body;
+    data = {
+        _id: idemploye, 
+    }
+
     try {
-        const documents = await readDocumentsByID('employes', idemployes);
+        const documents = await readDocumentsByID('rendezvous', data);
         if (documents) {
-            const historiqueRendezVous = documents.historique_rendez_vous;
+            const historiqueRendezVous = documents;
             response.json(historiqueRendezVous);
         } else {
             console.error('Erreur :', error);

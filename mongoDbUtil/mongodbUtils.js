@@ -18,6 +18,14 @@ async function readDocumentsByID(nomCollection, collectionId) {
     return documents;
 }
 
+//find by data
+async function readDocumentsByData(nomCollection, data) {
+    const db = await connectToDatabase();
+    const collection = db.collection(nomCollection);
+    const documents = await collection.find(data);
+    return documents;
+}
+
 //create
 async function createDocument(nomCollection, data) {
     const db = await connectToDatabase();
