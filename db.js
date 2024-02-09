@@ -1,13 +1,11 @@
 const { MongoClient } = require('mongodb');
-
-const url = 'mongodb://localhost:27017/';
-const dbName = 'salon';
+const config = require('./config/config');
 
 async function connectToDatabase() {
   try {
-    const client = await MongoClient.connect(url);
+    const client = await MongoClient.connect(config.database.url);
     console.log('Connexion bdd réussie');
-    return client.db(dbName);
+    return client.db(config.database.name);
   } catch (error) {
     console.error('Erreur lors de la connexion à la bdd :', error);
     throw error;
