@@ -12,7 +12,7 @@ router.get('/listeRendezvousClients', controllerRendezvous.listeRendezvousClient
 
 //crud service
 router.get('/listeService', controllerService.listeService);
-router.get('/insertService', controllerService.insertService);
-router.get('/updateService', controllerService.updateService);
+router.post('/insertService', controllerService.insertService);
+router.put('/updateService', controllerService.updateService);
 
 module.exports = router;
