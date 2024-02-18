@@ -25,13 +25,28 @@ async function readDocumentsByData(nomCollection, data) {
     const documents = await collection.find(data);
     return documents;
 }
+// find one document by data
+async function readOneDocumentByData(nomCollection, data) {
+    try {
+        const db = await connectToDatabase();
+        const collection = db.collection(nomCollection);
+        const document = await collection.findOne(data);
+        return document;
+    } catch (error) {
+        console.error('Erreur lors de la recherche du document:', error);
+        throw error; // Renvoyer l'erreur pour qu'elle puisse être gérée à un niveau supérieur
+    }
+}
+
 
 //create
 async function createDocument(nomCollection, data) {
+    console.log(data);
     const db = await connectToDatabase();
     const collection = db.collection(nomCollection);
     const result = await collection.insertOne(data);
-    return result;
+   // consolelog(data);   
+     return result;
 }
 
 //update
@@ -57,4 +72,6 @@ module.exports = {
     readDocumentsByID,
     updateDocument,
     deleteDocument,
+    readDocumentsByData,
+    readOneDocumentByData,
 };

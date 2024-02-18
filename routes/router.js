@@ -1,6 +1,9 @@
 const express = require("express");
 const controllerRendezvous = require("../controllers/controllerRendezvous");
 const controllerService = require("../controllers/controllerService");
+const controllerAuthentification = require("../controllers/controllerAuthentification");
+const controllerInscription = require("../controllers/controllerInscription");
+
 
 const router = express.Router();
 
@@ -14,5 +17,16 @@ router.get('/listeRendezvousClients', controllerRendezvous.listeRendezvousClient
 router.get('/listeService', controllerService.listeService);
 router.post('/insertService', controllerService.insertService);
 router.put('/updateService', controllerService.updateService);
+
+//login
+router.post('/login', controllerAuthentification.login);
+//verifier token
+router.get('/verifyToken', controllerAuthentification.checkToken);
+
+//inscription client
+router.post('/customer_registration', controllerInscription.inscriptionClient);
+router.post('/mail_test', controllerInscription.mailsentEmploye);
+
+
 
 module.exports = router;
