@@ -3,6 +3,7 @@ const controllerRendezvous = require("../controllers/controllerRendezvous");
 const controllerService = require("../controllers/controllerService");
 const controllerAuthentification = require("../controllers/controllerAuthentification");
 const controllerInscription = require("../controllers/controllerInscription");
+const controllerUser = require("../controllers/controllerUser");
 
 
 const router = express.Router();
@@ -12,6 +13,8 @@ const router = express.Router();
 router.get('/', controllerRendezvous.listeRendezvous);
 router.get('/listeRendezvousClients', controllerRendezvous.listeRendezvousClients);
 
+//User
+router.get('/listUser', controllerUser.listeUser);
 
 //crud service
 router.get('/listeService', controllerService.listeService);

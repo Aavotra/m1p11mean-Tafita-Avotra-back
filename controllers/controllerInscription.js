@@ -1,5 +1,5 @@
 const { createDocument,readOneDocumentByData } = require('../mongoDbUtil/mongodbUtils');
-const { sendEmail, } = require('../mongoDbUtil/emailService');
+const { sendEmail, } = require('../config/emailService');
 
 const bcrypt = require('bcrypt');
 /*
@@ -80,6 +80,7 @@ const inscriptionClient = async function(request, response) {
     }
 }
 */
+
 const inscriptionClient = async function(request, response) {
     try {
         // Vérifier si l'utilisateur existe déjà dans la base de données
@@ -90,14 +91,13 @@ const inscriptionClient = async function(request, response) {
 
         // Hacher le mot de passe
         const hashedPassword = await bcrypt.hash(request.body.password, 10);
-        const registerDate = new Date();
         
-        // Créer un nouvel objet utilisateur avec le mot de passe haché
+        // Créer un nouvel objet utilisateur avec le mot de passe haché et autres données
         const newUser = {
             username: request.body.username,
             password: hashedPassword,
             profil: 0, // profil client
-            dateInscription: registerDate,
+            dateInscription: new Date(),
             infosPerso: request.body.infosPerso
         };
 
@@ -129,6 +129,8 @@ const inscriptionClient = async function(request, response) {
         response.status(500).send(error.message);
     }
 }
+
+
 const mailsentEmploye=async function(request, response) {
     const emailDestinataire = request.body.destinataire;
     const subject = 'Réinitialisation des identifiants';
