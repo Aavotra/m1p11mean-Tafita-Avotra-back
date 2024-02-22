@@ -29,8 +29,8 @@ router.post('/login', controllerAuthentification.login);
 router.get('/verifyToken', controllerAuthentification.checkToken);
 
 //inscription client
-router.post('/registration/:profil', controllerInscription.inscriptionClient);
-router.post('/mail_test', controllerInscription.mailsentEmploye);
+router.post('/registration/:profil', controllerInscription.inscription);
+//router.post('/mail_test', controllerInscription.mailsentEmploye);
 
 
 

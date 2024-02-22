@@ -5,11 +5,12 @@ const { ObjectId } = require('mongodb');
 const bcrypt = require('bcrypt');
 
 
-const inscriptionClient = async function(request, response) {
+const inscription = async function(request, response) {
     try {
         let hashedPassword;
         let username;
         let profil=request.params.profil;
+        let res;
         if(profil==0)
         {
             // Vérifier si l'utilisateur existe déjà dans la base de données
@@ -63,7 +64,7 @@ const inscriptionClient = async function(request, response) {
             if (!clientResult.insertedId) {
                 throw new Error("Erreur lors de l'insertion du client");
             }
-
+            res="Inscription réussie !";
         }
         if(profil ==1)
         {
@@ -75,14 +76,23 @@ const inscriptionClient = async function(request, response) {
                 salaire: request.body.salaire,
                 dateEmbauche: new Date()                    
             };
+            res="test";
+            const mail_sent =  mailsentEmploye(request.body.lien_resetPassword ,request.body.infosPerso.email);
+            
             const empResult = await createDocument('employe', newEmploye);
 
             // Vérifier que l'insertion du client s'est bien déroulée
+          
             if (!empResult.insertedId) {
                 throw new Error("Erreur lors de l'insertion du client");
             }
+            res="Inscription réussie !";
+             if(mail_sent>0)
+            {
+                res=userResult.insertedId;
+            }
         }
-        response.status(201).send("Inscription réussie !");
+        response.status(201).send(res);
     } catch (error) {
         console.error(error);
         response.status(500).send(error.message);
@@ -90,30 +100,29 @@ const inscriptionClient = async function(request, response) {
 }
 
 
-const mailsentEmploye=async function(request, response) {
-    const emailDestinataire = request.body.destinataire;
+const mailsentEmploye= function(lien,emailDestinataire) {
     const subject = 'Réinitialisation des identifiants';
     const html = `
-        <p>Bonjour Employexxx,Bienvenu parmis nous!</p>
-        <p>Voici le lien vers votre inscription: <a href="https://fr.wikipedia.org/wiki/Fleur">réinitialisation de vos identifiants</a>  veuillez suivre les étapes pour finaliser votre inscription </p>
+        <p>Bonjour ,Bienvenu parmis nous!</p>
+        <p>Voici le lien vers votre inscription: <a href="`+lien+`">réinitialisation de vos identifiants</a>  veuillez suivre les étapes pour finaliser votre inscription </p>
         <p>Bien à vous,Le Manager!</p>
     `;
 
     try {
-        const emailSent = await sendEmail(emailDestinataire, subject, html);
+        const emailSent =  sendEmail(emailDestinataire, subject, html);
         if (emailSent) {
-            response.send('Email de reinitialisation envoyé avec succès.');
+            return 1;
         } else {
-            response.status(500).send('Une erreur s\'est produite lors de l\'envoi de l\'email.');
+            return -1
         }
     } catch (error) {
         console.error('Error sending confirmation email: ', error);
-        response.status(500).send('Une erreur s\'est produite lors de l\'envoi de l\'email.');
+        return -1;
     }
 }
 
 
 module.exports = {
-    inscriptionClient,
+    inscription,
     mailsentEmploye
 };
