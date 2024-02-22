@@ -1,102 +1,40 @@
 const { createDocument,readOneDocumentByData } = require('../mongoDbUtil/mongodbUtils');
 const { sendEmail, } = require('../config/emailService');
+const { ObjectId } = require('mongodb');
 
 const bcrypt = require('bcrypt');
-/*
+
+
 const inscriptionClient = async function(request, response) {
     try {
-        // Vérifier si l'utilisateur existe déjà dans la base de données
-        const existingUser = await readDocumentsByData('user', { username: request.body.username });
-        if (existingUser) {
-            return response.status(400).send("Cet utilisateur existe déjà.");
+        let hashedPassword;
+        let username;
+        let profil=request.params.profil;
+        if(profil==0)
+        {
+            // Vérifier si l'utilisateur existe déjà dans la base de données
+            username= request.body.username
+            // Hacher le mot de passe
+            hashedPassword = await bcrypt.hash(request.body.password, 10);
         }
-
-        // Hacher le mot de passe
-        const hashedPassword = await bcrypt.hash(request.body.password, 10);
-        const registerDate = new Date();
-        // Créer un nouvel objet utilisateur avec le mot de passe haché
-        const newUser = {
-            username: request.body.username,
-            password: hashedPassword,
-            profil: 0, // profil client
-            dateInscription: registerDate,
-            infosPerso: request.body.infosPerso
-        };
-        // Insérer le nouvel utilisateur dans la base de données
-        const result = await createDocument('user', newUser);
-        response.status(201).send("Inscription réussie !");
-    } catch (error) {
-        console.error(error);
-        response.status(500).send(error);
-    }
-}*/
-
-/*const inscriptionClient = async function(request, response) {
-    try {
-        // Vérifier si l'utilisateur existe déjà dans la base de données
-        const existingUser = await readOneDocumentByData('user', { username: request.body.username });
-        console.log(existingUser);
+        if(profil==1)
+        {
+            // Vérifier si l'utilisateur existe déjà dans la base de données
+            const randomNumber = Math.floor(Math.random() * 101);
+            username= request.body.infosPerso.nom+request.body.infosPerso.prenom+randomNumber;
+            // Hacher le mot de passe
+            hashedPassword = await bcrypt.hash('0000', 10);
+        }
+        const existingUser = await readOneDocumentByData('user', { username:username });
         if (existingUser) {
             return response.status(400).json({ message: "Cet utilisateur existe déjà" });
         }
 
-        // Hacher le mot de passe
-        const hashedPassword = await bcrypt.hash(request.body.password, 10);
-        const registerDate = new Date();
-        // Créer un nouvel objet utilisateur avec le mot de passe haché
-        const newUser = {
-            username: request.body.username,
-            password: hashedPassword,
-            profil: 0, // profil client
-            dateInscription: registerDate,
-            infosPerso: request.body.infosPerso
-        };
-        // Insérer le nouvel utilisateur dans la base de données
-        const userResult = await createDocument('user', newUser);
-
-        // Vérifier que l'insertion de l'utilisateur s'est bien déroulée
-        if (!userResult.insertedId) {
-            throw new Error("Erreur lors de l'insertion de l'utilisateur");
-        }
-
-        // Créer un nouvel objet client avec le nouvel identifiant utilisateur et un portefeuille initial
-        const newClient = {
-            idUser: userResult.insertedId,
-            porteFeuille: [{ entree: 0, sortie: 0, date: new Date() }] // Valeurs par défaut pour le portefeuille
-        };
-
-        // Insérer le nouvel utilisateur dans la base de données
-        const clientResult = await createDocument('client', newClient);
-
-        // Vérifier que l'insertion du client s'est bien déroulée
-        if (!clientResult.insertedId) {
-            throw new Error("Erreur lors de l'insertion du client");
-        }
-
-        response.status(201).send("Inscription réussie !");
-    } catch (error) {
-        console.error(error);
-        response.status(500).send(error.message);
-    }
-}
-*/
-
-const inscriptionClient = async function(request, response) {
-    try {
-        // Vérifier si l'utilisateur existe déjà dans la base de données
-        const existingUser = await readOneDocumentByData('user', { username: request.body.username });
-        if (existingUser) {
-            return response.status(400).json({ message: "Cet utilisateur existe déjà" });
-        }
-
-        // Hacher le mot de passe
-        const hashedPassword = await bcrypt.hash(request.body.password, 10);
-        
         // Créer un nouvel objet utilisateur avec le mot de passe haché et autres données
         const newUser = {
-            username: request.body.username,
+            username: username,
             password: hashedPassword,
-            profil: 0, // profil client
+            profil: request.params.profil, // profil client
             dateInscription: new Date(),
             infosPerso: request.body.infosPerso
         };
@@ -109,20 +47,41 @@ const inscriptionClient = async function(request, response) {
             throw new Error("Erreur lors de l'insertion de l'utilisateur");
         }
 
-        // Créer un nouvel objet client avec le nouvel identifiant utilisateur et un portefeuille initial
-        const newClient = {
-            idUser: userResult.insertedId,
-            porteFeuille: [{ entree: 0, sortie: 0, date: new Date() }] // Valeurs par défaut pour le portefeuille
-        };
+        if(profil ==0)
+        {
+            // Créer un nouvel objet client avec le nouvel identifiant utilisateur et un portefeuille initial
+            const newClient = {
+                idUser: userResult.insertedId,
+                porteFeuille: [{ entree: 0, sortie: 0, date: new Date() }] // Valeurs par défaut pour le portefeuille
+            };
 
-        // Insérer le nouvel utilisateur dans la base de données
-        const clientResult = await createDocument('client', newClient);
+            // Insérer le nouvel utilisateur dans la base de données
+        
+            const clientResult = await createDocument('client', newClient);
 
-        // Vérifier que l'insertion du client s'est bien déroulée
-        if (!clientResult.insertedId) {
-            throw new Error("Erreur lors de l'insertion du client");
+            // Vérifier que l'insertion du client s'est bien déroulée
+            if (!clientResult.insertedId) {
+                throw new Error("Erreur lors de l'insertion du client");
+            }
+
         }
+        if(profil ==1)
+        {
 
+            const newEmploye = {
+                idUser: userResult.insertedId,
+                matricule:'emp001',
+                postes: request.body.postes.map(poste =>new ObjectId(poste)),
+                salaire: request.body.salaire,
+                dateEmbauche: new Date()                    
+            };
+            const empResult = await createDocument('employe', newEmploye);
+
+            // Vérifier que l'insertion du client s'est bien déroulée
+            if (!empResult.insertedId) {
+                throw new Error("Erreur lors de l'insertion du client");
+            }
+        }
         response.status(201).send("Inscription réussie !");
     } catch (error) {
         console.error(error);

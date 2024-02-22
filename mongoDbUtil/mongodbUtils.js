@@ -20,11 +20,21 @@ async function readDocumentsByID(nomCollection, collectionId) {
 
 //find by data
 async function readDocumentsByData(nomCollection, data) {
-    const db = await connectToDatabase();
-    const collection = db.collection(nomCollection);
-    const documents = await collection.find(data);
-    return documents;
+    try {
+        const db = await connectToDatabase();
+        const collection = db.collection(nomCollection);
+        
+        // Utilisation de toArray() pour obtenir les résultats sous forme de tableau
+        const documents = await collection.find(data).toArray();
+        
+        console.log(data);
+        return documents;
+    } catch (error) {
+        console.error('Erreur lors de la lecture des documents :', error);
+        throw error; // Renvoyer l'erreur pour qu'elle puisse être gérée à un niveau supérieur
+    }
 }
+
 // find one document by data
 async function readOneDocumentByData(nomCollection, data) {
     try {

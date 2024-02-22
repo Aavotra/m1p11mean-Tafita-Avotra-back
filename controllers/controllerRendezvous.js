@@ -1,5 +1,5 @@
 const { createDocument, readDocuments, readDocumentsByID, updateDocument, deleteDocument } = require('../mongoDbUtil/mongodbUtils');
-
+const { ObjectId } = require('mongodb');
 const listeRendezvous = async function(request, response) {
     try {
         const documents = await readDocuments('rendezvous');
@@ -48,26 +48,37 @@ const listeRendezvousEmployes = async function(request, response) {
 };
 
 const priseDeRendezvous = async function(request, response) {
-
-    const { idclient, idEmploye, idservice, date, prix, paye_en_ligne } = request.body;
+    const { idClient, idEmploye } = request.body;
 
     try {
+        // Convertir les idService en ObjectId
+        const servicesWithObjectIds = request.body.service.map(service => ({
+            ...service,
+            idService: new ObjectId(service.idService.replace(/^ObjectId\('(.*)'\)$/, '$1'))
+        }));
+
+        // Calcul du prix total
+        let prixTotal = servicesWithObjectIds.reduce((acc, obj) => acc + parseInt(obj.prix), 0);
+
+        // Création de l'objet de données
         const data = {
-            idclient: idclient,
-            idEmploye: idEmploye,
-            idservice: idservice,
-            date: date,
-            prix: prix,
-            paye_en_ligne: paye_en_ligne
+            service: servicesWithObjectIds,
+            date: new Date(),
+            etatPaiement: false,
+            prixTotal: prixTotal,
+            etatRdv: "0",
+            idEmploye: new ObjectId(idEmploye),
+            idClient: new ObjectId(idClient)
         };
 
+        // Insertion du document dans la collection
         const result = await createDocument('rendezvous', data);
+
         response.status(200).json({
             success: true,
             message: 'Prise de rendez-vous avec succès',
-            professionalId: result.insertedId
-        });
-        
+            rendezVousId: result.insertedId
+        });        
     } catch (error) {
         console.error('Erreur lors de l\'insertion de la prise de rendez-vous :', error);
         response.status(500).json({

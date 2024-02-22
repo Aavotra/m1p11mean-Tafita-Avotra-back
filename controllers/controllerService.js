@@ -1,8 +1,18 @@
-const { createDocument, readDocuments, readDocumentsByID, updateDocument, deleteDocument } = require('../mongoDbUtil/mongodbUtils');
+const { createDocument, readDocuments, readDocumentsByData, updateDocument, deleteDocument } = require('../mongoDbUtil/mongodbUtils');
+const { ObjectId } = require('mongodb');
 
 const listeService = async function(request, response) {
+    let documents;
     try {
-        const documents = await readDocuments('service');
+        if(request.body.idCategorie)
+        {
+            documents=await readDocumentsByData('service', {idCategorie:new ObjectId(request.body.idCategorie)});
+        }
+        else
+        {
+            documents = await readDocuments('service');
+
+        }
         response.json(documents);
     } catch (error) {
         console.error('Erreur :', error);
@@ -11,14 +21,15 @@ const listeService = async function(request, response) {
 };
 
 const insertService = async function(request, response) {
-    const { nom, prix, duree, commission } = request.body;
-
+    const { nom, prix, duree, commission,idCategorie,image} = request.body;
     try {
         const data = {
             nom: nom,
             prix: prix,
-            duree: duree,
             commission: commission,
+            duree: duree,
+            idCategorie: new ObjectId(idCategorie),
+            image: image
         };
 
         const result = await createDocument('service', data);
