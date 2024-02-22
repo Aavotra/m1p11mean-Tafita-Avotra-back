@@ -2,13 +2,13 @@ const config = {
     development: {
         database: {
             url: 'mongodb://localhost:27017/',
-            name: 'salon'
+            name: 'exam_salon'
         }
     },
     test: {
         database: {
             url: 'mongodb://localhost:27017/',
-            name: 'salon'
+            name: 'exam_salon'
         }
     },
     production: {
