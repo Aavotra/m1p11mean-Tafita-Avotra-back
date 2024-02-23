@@ -13,6 +13,7 @@ const router = express.Router();
 router.get('/', controllerRendezvous.listeRendezvous);
 router.get('/listeRendezvousClients', controllerRendezvous.listeRendezvousClients);
 router.post('/take_appointment', controllerRendezvous.priseDeRendezvous);
+router.post('/payer_rendezVous/:idRdv',controllerRendezvous.payer);
 
 
 //User
@@ -30,6 +31,7 @@ router.get('/verifyToken', controllerAuthentification.checkToken);
 
 //inscription client
 router.post('/registration/:profil', controllerInscription.inscription);
+router.put('/reset_identifiers', controllerInscription.reinitialisationIdentifiants);
 //router.post('/mail_test', controllerInscription.mailsentEmploye);
 
 

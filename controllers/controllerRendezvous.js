@@ -1,22 +1,22 @@
-const { createDocument, readDocuments, readDocumentsByID, updateDocument, deleteDocument } = require('../mongoDbUtil/mongodbUtils');
+const { createDocument, readDocuments, readDocumentsByID,ajouterPaiement, updateDocument, deleteDocument } = require('../mongoDbUtil/mongodbUtils');
 const { ObjectId } = require('mongodb');
 const listeRendezvous = async function(request, response) {
     try {
-        const documents = await readDocuments('rendezvous');
+        const documents = await readDocuments('rendezVous');
         response.json(documents);
     } catch (error) {
         console.error('Erreur :', error);
         response.status(500).send('Document introuvable');
     }
 };
-
+//historique des rendez-vous
 const listeRendezvousClients = async function(request, response) {
-    const { idclients } = request.body;
+    const { idClient } = request.body;
     try {
-        const documents = await readDocumentsByID('clients', idclients);
+        const documents = await readDocumentsByID('rendezVous', idClient,"idClient");
         if (documents) {
-            const historiqueRendezVous = documents.historique_rendez_vous;
-            response.json(historiqueRendezVous);
+            //const historiqueRendezVous = documents.historique_rendez_vous;
+            response.json(documents);
         } else {
             console.error('Erreur :', error);
             response.status(500).send('Document introuvable');
@@ -25,7 +25,7 @@ const listeRendezvousClients = async function(request, response) {
         response.status(500).send('Document introuvable');
     }
 };
-
+/*
 const listeRendezvousEmployes = async function(request, response) {
     const { idemploye } = request.body;
     data = {
@@ -46,7 +46,7 @@ const listeRendezvousEmployes = async function(request, response) {
         response.status(500).send('Document introuvable');
     }
 };
-
+*/
 const priseDeRendezvous = async function(request, response) {
     const { idClient, idEmploye } = request.body;
 
@@ -87,10 +87,31 @@ const priseDeRendezvous = async function(request, response) {
         });
     }
 };
+//Paiement en ligne 
 
+const payer=async function (request,response){
+    const documentId = new ObjectId(request.params.idRdv); // ID du rendezVous à mettre à jour
+    const nouveauPaiement = 
+    {
+        montant:request.body.montant,
+        date: new Date(request.body.date)
+    };
+
+    const ajoutReussi = await ajouterPaiement(documentId, nouveauPaiement);
+
+    if (ajoutReussi) {
+        console.log('Paiement ajouté avec succès.');
+        response.status(200).json("Payé!")
+    } else {
+        console.log('Échec de l\'ajout du paiement.');
+        response.status(500).json("Une erreur s'est produite pendant le paiement,Veuillez réessayaer!")
+
+    }
+}
 module.exports = {
     listeRendezvous,
     listeRendezvousClients,
-    listeRendezvousEmployes,
+    //listeRendezvousEmployes,
     priseDeRendezvous,
+    payer
 };

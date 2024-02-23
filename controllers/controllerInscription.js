@@ -1,16 +1,30 @@
-const { createDocument,readOneDocumentByData } = require('../mongoDbUtil/mongodbUtils');
+const { createDocument,readOneDocumentByData,updateDocument } = require('../mongoDbUtil/mongodbUtils');
 const { sendEmail, } = require('../config/emailService');
 const { ObjectId } = require('mongodb');
 
 const bcrypt = require('bcrypt');
 
-
+const reinitialisationIdentifiants = async function(request, response) {
+    try {
+        const idUser = request.body.idUser; 
+        hashedPassword = await bcrypt.hash(request.body.password, 10);
+        const updatedData = {
+            username: request.body.username,
+            password: hashedPassword
+        };
+        const updatedUser = await updateDocument("user", idUser, updatedData);
+        response.status(200).send("Réinitialisation des identifiants avec succès!");
+    } catch (error) {
+        console.error("Erreur pendant la réinitialisation des identifiants", error);
+        response.status(500).send("Erreur pendant la réinitialisation des identifiants");
+    }
+};
 const inscription = async function(request, response) {
     try {
         let hashedPassword;
         let username;
         let profil=request.params.profil;
-        let res;
+        //let res;
         if(profil==0)
         {
             // Vérifier si l'utilisateur existe déjà dans la base de données
@@ -64,7 +78,7 @@ const inscription = async function(request, response) {
             if (!clientResult.insertedId) {
                 throw new Error("Erreur lors de l'insertion du client");
             }
-            res="Inscription réussie !";
+          //  res="Inscription réussie !";
         }
         if(profil ==1)
         {
@@ -76,8 +90,7 @@ const inscription = async function(request, response) {
                 salaire: request.body.salaire,
                 dateEmbauche: new Date()                    
             };
-            res="test";
-            const mail_sent =  mailsentEmploye(request.body.lien_resetPassword ,request.body.infosPerso.email);
+            const mail_sent =  mailsentEmploye(request.body.lien_resetPassword+"/"+userResult.insertedId ,request.body.infosPerso.email);
             
             const empResult = await createDocument('employe', newEmploye);
 
@@ -86,13 +99,13 @@ const inscription = async function(request, response) {
             if (!empResult.insertedId) {
                 throw new Error("Erreur lors de l'insertion du client");
             }
-            res="Inscription réussie !";
-             if(mail_sent>0)
+            //res="Inscription réussie !";
+           /*  if(mail_sent>0)
             {
                 res=userResult.insertedId;
-            }
+            }*/
         }
-        response.status(201).send(res);
+        response.status(201).send("Inscription réussie");
     } catch (error) {
         console.error(error);
         response.status(500).send(error.message);
@@ -122,7 +135,9 @@ const mailsentEmploye= function(lien,emailDestinataire) {
 }
 
 
+
 module.exports = {
     inscription,
-    mailsentEmploye
+    mailsentEmploye,
+    reinitialisationIdentifiants
 };

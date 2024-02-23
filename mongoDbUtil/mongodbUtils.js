@@ -10,11 +10,16 @@ async function readDocuments(nomCollection) {
 }
 
 //find by id
-async function readDocumentsByID(nomCollection, collectionId) {
+async function readDocumentsByID(nomCollection, collectionId, fieldName) {
     const objectId = new ObjectId(collectionId);
     const db = await connectToDatabase();
     const collection = db.collection(nomCollection);
-    const documents = await collection.findOne({ _id: objectId });
+    // Construction de la query dynamique avec le champ spécifié
+    const query = {};
+    query[fieldName] = objectId;
+
+    const documents = await collection.find(query).toArray();
+    console.log(objectId);
     return documents;
 }
 
@@ -63,7 +68,7 @@ async function createDocument(nomCollection, data) {
 async function updateDocument(nomCollection, collectionId, updatedData) {
     const db = await connectToDatabase();
     const collection = db.collection(nomCollection);
-    const result = await collection.updateOne({ _id: ObjectId(collectionId) }, { $set: updatedData });
+    const result = await collection.updateOne({ _id: new ObjectId(collectionId) }, { $set: updatedData });
     return result;
 }
 
@@ -72,10 +77,25 @@ async function deleteDocument(nomCollection, collectionId) {
     
     const db = await connectToDatabase();
     const collection = db.collection(nomCollection);
-    const result = await collection.deleteOne({ _id: ObjectId(collectionId) });
+    const result = await collection.deleteOne({ _id: new ObjectId(collectionId) });
     return result;
 }
+async function ajouterPaiement(documentId, nouveauPaiement) {
+    const db = await connectToDatabase();
+    const collection = db.collection('rendezVous');
 
+    // Filtre pour sélectionner le document à mettre à jour
+    const filter = { _id: new ObjectId(documentId) };
+
+    // Mise à jour du document en ajoutant le nouveau paiement au tableau 'paiement'
+    const updateResult = await collection.updateOne(
+        filter,
+        { $push: { paiement: nouveauPaiement } },
+        { upsert: true }
+    );
+
+    return updateResult.modifiedCount > 0;
+}
 module.exports = {
     createDocument,
     readDocuments,
@@ -84,4 +104,5 @@ module.exports = {
     deleteDocument,
     readDocumentsByData,
     readOneDocumentByData,
+    ajouterPaiement
 };
