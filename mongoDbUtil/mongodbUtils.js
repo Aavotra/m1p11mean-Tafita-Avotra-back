@@ -19,7 +19,6 @@ async function readDocumentsByID(nomCollection, collectionId, fieldName) {
     query[fieldName] = objectId;
 
     const documents = await collection.find(query).toArray();
-    console.log(objectId);
     return documents;
 }
 
@@ -96,6 +95,22 @@ async function ajouterPaiement(documentId, nouveauPaiement) {
 
     return updateResult.modifiedCount > 0;
 }
+async function abonnementPortefeuille(documentId, transaction) {
+    const db = await connectToDatabase();
+    const collection = db.collection('client');
+
+    // Filtre pour sélectionner le document à mettre à jour
+    const filter = { _id: new ObjectId(documentId) };
+
+    // Mise à jour du document en ajoutant le nouveau paiement au tableau 'paiement'
+    const updateResult = await collection.updateOne(
+        filter,
+        { $push: { porteFeuille: transaction } },
+        { upsert: true }
+    );
+
+    return updateResult.modifiedCount > 0;
+}
 module.exports = {
     createDocument,
     readDocuments,
@@ -104,5 +119,6 @@ module.exports = {
     deleteDocument,
     readDocumentsByData,
     readOneDocumentByData,
-    ajouterPaiement
+    ajouterPaiement,
+    abonnementPortefeuille
 };

@@ -1,4 +1,4 @@
-const { createDocument, readDocuments, readDocumentsByID,ajouterPaiement, updateDocument, deleteDocument } = require('../mongoDbUtil/mongodbUtils');
+const { createDocument, readDocuments, readDocumentsByID,ajouterPaiement,abonnementPortefeuille, updateDocument, deleteDocument } = require('../mongoDbUtil/mongodbUtils');
 const { ObjectId } = require('mongodb');
 const listeRendezvous = async function(request, response) {
     try {
@@ -11,7 +11,7 @@ const listeRendezvous = async function(request, response) {
 };
 //historique des rendez-vous
 const listeRendezvousClients = async function(request, response) {
-    const { idClient } = request.body;
+    const idClient = new ObjectId(request.params.idClient);
     try {
         const documents = await readDocumentsByID('rendezVous', idClient,"idClient");
         if (documents) {
@@ -72,7 +72,7 @@ const priseDeRendezvous = async function(request, response) {
         };
 
         // Insertion du document dans la collection
-        const result = await createDocument('rendezvous', data);
+        const result = await createDocument('rendezVous', data);
 
         response.status(200).json({
             success: true,
@@ -108,10 +108,35 @@ const payer=async function (request,response){
 
     }
 }
+
+//Paiement en ligne 
+
+const abonnement=async function (request,response){
+    const clientId = new ObjectId(request.params.idClient); // ID du rendezVous à mettre à jour
+    const transaction = 
+    {
+        entree:request.body.entree,
+        sortie:request.body.sortie,
+        date: new Date()
+    };
+
+    const ajoutReussi = await abonnementPortefeuille(clientId, transaction);
+
+    try {
+        console.log('Abonnement  avec succès.');
+        response.status(200).json("Abonnement  avec succès!")
+    } catch(error) {
+        console.error('Échec de l\'ajout du paiement.',error);
+        response.status(500).json("Une erreur s'est produite pendant la transaction,Veuillez réessayaer!")
+
+    }
+}
+
 module.exports = {
     listeRendezvous,
     listeRendezvousClients,
     //listeRendezvousEmployes,
     priseDeRendezvous,
+    abonnement,
     payer
 };
