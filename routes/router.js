@@ -4,6 +4,8 @@ const controllerService = require("../controllers/controllerService");
 const controllerAuthentification = require("../controllers/controllerAuthentification");
 const controllerInscription = require("../controllers/controllerInscription");
 const controllerUser = require("../controllers/controllerUser");
+const controllerEmploye = require("../controllers/controllerEmploye");
+
 
 
 const router = express.Router();
@@ -15,9 +17,13 @@ router.get('/listeRendezvousClients/:idClient', controllerRendezvous.listeRendez
 router.post('/take_appointment', controllerRendezvous.priseDeRendezvous);
 router.post('/payer_rendezVous/:idRdv',controllerRendezvous.payer);
 router.post('/abonnement_portefeuille/:idClient',controllerRendezvous.abonnement);
+//router.get('/solde_disponible/:idClient',controllerRendezvous.solde_disponible);
 
 
 
+
+//Liste employés
+router.get('/listEmploye', controllerEmploye.listeEmploye);
 
 
 //User

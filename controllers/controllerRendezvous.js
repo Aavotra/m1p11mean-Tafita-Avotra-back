@@ -1,5 +1,5 @@
-const { createDocument, readDocuments, readDocumentsByID,ajouterPaiement,abonnementPortefeuille, updateDocument, deleteDocument } = require('../mongoDbUtil/mongodbUtils');
-const { ObjectId } = require('mongodb');
+const { createDocument, readDocuments, readDocumentsByID,ajouterPaiement,abonnementPortefeuille,getSoldeDispo,updateDocument, deleteDocument } = require('../mongoDbUtil/mongodbUtils');
+const { ObjectId, Double } = require('mongodb');
 const listeRendezvous = async function(request, response) {
     try {
         const documents = await readDocuments('rendezVous');
@@ -91,25 +91,75 @@ const priseDeRendezvous = async function(request, response) {
 
 const payer=async function (request,response){
     const documentId = new ObjectId(request.params.idRdv); // ID du rendezVous à mettre à jour
-    const nouveauPaiement = 
-    {
+    const nouveauPaiement = {
         montant:request.body.montant,
-        date: new Date(request.body.date)
+        date: new Date()
     };
+    
+    const solde=await solde_disponible(request.body.idClient);
+    const transaction = 
+    {
+        entree:0,
+        sortie:request.body.montant,
+        date: new Date()
+    };
+    if(request.body.etatPaiement==false)
+    {
+        if(solde.valueOf(Double)>request.body.montant)
+            {
+                const ajoutReussi = await ajouterPaiement(documentId, nouveauPaiement);
+                const ajoutPortefeuille = await abonnementPortefeuille(request.body.idClient, transaction)
+                try {
+                    if (ajoutReussi) {
+                        response.status(200).json("Payé!")
+                    } else {
+                        response.json("Une erreur s'est produite pendant le paiement,Veuillez réessayer!")
+                    } 
+                } catch (error) {
+                    console.error("err paiement ",error);
+                }
+            
+                try {
+                    if (ajoutPortefeuille) {
+                        response.status(200).json("transaction de paiement effectué!")
+                    } else {
+                        response.json("Echec de la transaction!")
+                    }
+                } catch (error) {
+                    console.error("err transaction  ",error);
+                }
+            
+        }
+        else
+        {
+            response.json("Solde insuffisante pour le paiement!");
+        }
+    }
+    else{
+        response.json("Ce rendez-vous a déjà été payé en intégralité!");
 
-    const ajoutReussi = await ajouterPaiement(documentId, nouveauPaiement);
+    }
+    
+}
 
-    if (ajoutReussi) {
-        console.log('Paiement ajouté avec succès.');
-        response.status(200).json("Payé!")
-    } else {
-        console.log('Échec de l\'ajout du paiement.');
-        response.status(500).json("Une erreur s'est produite pendant le paiement,Veuillez réessayaer!")
+//Paiement en ligne
+async function solde_disponible (idClient)
+{
+    try {
+        const document = await getSoldeDispo( idClient);
+        if (document) {
+          
+            return document.soldeDisponible;
 
+        } else {
+            console.error(' document non trouvé ');
+           // response.status(500).send('Document introuvable');
+        }
+    } catch (error) {
+        console.error('Erreur :', error);
     }
 }
 
-//Paiement en ligne 
 
 const abonnement=async function (request,response){
     const clientId = new ObjectId(request.params.idClient); // ID du rendezVous à mettre à jour
@@ -119,8 +169,8 @@ const abonnement=async function (request,response){
         sortie:request.body.sortie,
         date: new Date()
     };
-
-    const ajoutReussi = await abonnementPortefeuille(clientId, transaction);
+;
+    const ajoutReussi = await abonnementPortefeuille(clientId, transaction)
 
     try {
         console.log('Abonnement  avec succès.');
@@ -132,11 +182,13 @@ const abonnement=async function (request,response){
     }
 }
 
+
 module.exports = {
     listeRendezvous,
     listeRendezvousClients,
     //listeRendezvousEmployes,
     priseDeRendezvous,
     abonnement,
-    payer
+    payer,
+    //solde_disponible
 };
