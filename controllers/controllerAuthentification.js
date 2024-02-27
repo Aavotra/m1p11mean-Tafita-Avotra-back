@@ -29,7 +29,7 @@ const login = async function(request, response) {
       clientId: client._id
     };
     const token = jwt.sign(payload, secretKey, { expiresIn: '1h' });
-    response.json({ token });
+    response.json({ token, username});
   } catch (err) {
     console.error('Erreur lors de l\'authentification:', err);
     response.status(500).json({ message: 'Erreur lors de l\'authentification' });

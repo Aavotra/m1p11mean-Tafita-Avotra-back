@@ -64,8 +64,7 @@ async function createDocument(nomCollection, data) {
     const db = await connectToDatabase();
     const collection = db.collection(nomCollection);
     const result = await collection.insertOne(data);
-   // consolelog(data);   
-     return result;
+    return result;
 }
 
 //update
@@ -75,6 +74,7 @@ async function updateDocument(nomCollection, collectionId, updatedData) {
     const result = await collection.updateOne({ _id: new ObjectId(collectionId) }, { $set: updatedData });
     return result;
 }
+
 
 //delete
 async function deleteDocument(nomCollection, collectionId) {
