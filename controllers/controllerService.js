@@ -22,15 +22,6 @@ const listeService = async function(request, response) {
 
 const insertService = async function(request, response) {
     const { nom, prix, duree, commission,idCategorie,image} = request.body;
-    try {
-        const data = {
-            nom: nom,
-            prix: prix,
-            commission: commission,
-            duree: duree,
-            idCategorie: new ObjectId(idCategorie),
-            image: image
-    const { nom, prix, duree, commission, idCategorie, image } = request.body;
 
     try {
         const data = {

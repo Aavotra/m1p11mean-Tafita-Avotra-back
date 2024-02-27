@@ -4,7 +4,6 @@ const { ObjectId } = require('mongodb');
 
 const bcrypt = require('bcrypt');
 
-
 const reinitialisationIdentifiants = async function(request, response) {
     try {
         const idUser = request.body.idUser; 
@@ -20,6 +19,7 @@ const reinitialisationIdentifiants = async function(request, response) {
         response.status(500).send("Erreur pendant la réinitialisation des identifiants");
     }
 };
+
 const inscription = async function(request, response) {
     try {
         let hashedPassword;
@@ -42,11 +42,6 @@ const inscription = async function(request, response) {
             hashedPassword = await bcrypt.hash('0000', 10);
         }
         const existingUser = await readOneDocumentByData('user', { username:username });
-
-const inscriptionClient = async function(request, response) {
-    try {
-        // Vérifier si l'utilisateur existe déjà dans la base de données
-        const existingUser = await readOneDocumentByData('user', { username: request.body.username });
         if (existingUser) {
             return response.status(400).json({ message: "Cet utilisateur existe déjà" });
         }
