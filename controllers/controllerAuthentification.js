@@ -19,14 +19,17 @@ const login = async function(request, response) {
     if (!passwordMatch) {
       return response.status(401).json({ message: 'Mot de passe non valide' });
     }
+    const client = await readOneDocumentByData('client', {idUser:user._id});
 
+    
     // Si l'authentification réussit, générer le token JWT
     const payload = {
       userId: user._id,
-      profil: user.profil 
+      profil: user.profil ,
+      clientId: client._id
     };
     const token = jwt.sign(payload, secretKey, { expiresIn: '1h' });
-    response.json({ token });
+    response.json({ token, username});
   } catch (err) {
     console.error('Erreur lors de l\'authentification:', err);
     response.status(500).json({ message: 'Erreur lors de l\'authentification' });
