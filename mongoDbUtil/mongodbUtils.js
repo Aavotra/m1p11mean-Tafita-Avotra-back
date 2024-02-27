@@ -45,17 +45,22 @@ async function createDocument(nomCollection, data) {
     const db = await connectToDatabase();
     const collection = db.collection(nomCollection);
     const result = await collection.insertOne(data);
-   // consolelog(data);   
-     return result;
+    return result;
 }
 
 //update
 async function updateDocument(nomCollection, collectionId, updatedData) {
-    const db = await connectToDatabase();
-    const collection = db.collection(nomCollection);
-    const result = await collection.updateOne({ _id: ObjectId(collectionId) }, { $set: updatedData });
-    return result;
+    try {
+        const db = await connectToDatabase();
+        const collection = db.collection(nomCollection);
+        const result = await collection.updateOne({ _id: new ObjectId(collectionId) }, { $set: updatedData });
+        return result;
+    } catch (error) {
+        console.error("Une erreur est survenue lors de la mise à jour du document :", error);
+        throw error;
+    }
 }
+
 
 //delete
 async function deleteDocument(nomCollection, collectionId) {
