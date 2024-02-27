@@ -91,23 +91,26 @@ const priseDeRendezvous = async function(request, response) {
 
 const payer=async function (request,response){
     const documentId = new ObjectId(request.params.idRdv); // ID du rendezVous à mettre à jour
+    const montant=request.body.montant;
     const nouveauPaiement = {
-        montant:request.body.montant,
+        montant:montant,
         date: new Date()
     };
     
     const solde=await solde_disponible(request.body.idClient);
-    const transaction = 
-    {
-        entree:0,
-        sortie:request.body.montant,
-        date: new Date()
-    };
+    
+
     if(request.body.etatPaiement==false)
     {
-        if(solde.valueOf(Double)>request.body.montant)
+        if(solde.valueOf(Double)>montant)
             {
                 const ajoutReussi = await ajouterPaiement(documentId, nouveauPaiement);
+                const transaction = 
+                {
+                    entree:0,
+                    sortie:montant,
+                    date: new Date()
+                };
                 const ajoutPortefeuille = await abonnementPortefeuille(request.body.idClient, transaction)
                 try {
                     if (ajoutReussi) {
@@ -159,8 +162,11 @@ async function solde_disponible (idClient)
         console.error('Erreur :', error);
     }
 }
+/*async function reste_a_payer()
+{
 
-
+}
+*/
 const abonnement=async function (request,response){
     const clientId = new ObjectId(request.params.idClient); // ID du rendezVous à mettre à jour
     const transaction = 

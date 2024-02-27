@@ -147,7 +147,19 @@ async function getSoldeDispo(idClient) {
         throw error; // Renvoyer l'erreur pour qu'elle puisse être gérée à un niveau supérieur
     }
 }
-
+async function get_reste_a_payer(idRdv)
+{
+    try {
+        const db = await connectToDatabase();
+        const collection = db.collection("rendezVous");
+        const document = await collection.findOne({ _id: new ObjectId(idClient) }, { soldeDisponible: 1 });
+       // console.log(document);
+        return document;
+    } catch (error) {
+        console.error('Erreur lors de la recherche du document:', error);
+        throw error; // Renvoyer l'erreur pour qu'elle puisse être gérée à un niveau supérieur
+    }
+}
 module.exports = {
     createDocument,
     readDocuments,
