@@ -1,13 +1,14 @@
 const config = {
     development: {
         database: {
-            //url: 'mongodb://localhost:27017/',
+//             url: 'mongodb://localhost:27017/',
             url: 'mongodb+srv://root:root@cluster0.hatvqdw.mongodb.net/exam_salon',
             name: 'exam_salon'
         }
     },
     test: {
         database: {
+//             url: 'mongodb://localhost:27017/',
             url: 'mongodb+srv://root:root@cluster0.hatvqdw.mongodb.net/exam_salon',
             name: 'exam_salon'
         }

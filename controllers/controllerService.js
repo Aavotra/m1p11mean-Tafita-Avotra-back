@@ -30,6 +30,16 @@ const insertService = async function(request, response) {
             duree: duree,
             idCategorie: new ObjectId(idCategorie),
             image: image
+    const { nom, prix, duree, commission, idCategorie, image } = request.body;
+
+    try {
+        const data = {
+            "nom": nom,
+            "prix": parseFloat(prix),
+            "commission": parseFloat(commission),
+            "duree": parseInt(duree),
+            "idCategorie": new ObjectId(idCategorie),
+            "image": image,
         };
 
         const result = await createDocument('service', data);
@@ -40,23 +50,26 @@ const insertService = async function(request, response) {
         });
         
     } catch (error) {
-        console.error('Erreur lors de la création d\'un service :', error);
+        console.error('Erreur lors de la création d\'un service :', error.errInfo);
         response.status(500).json({
             success: false,
-            message: 'Erreur lors de la création d\'un service.'
+            message: 'Erreur lors de la création d\'un service.'+error
         });
     }
 };
 
 const updateService = async function(request, response) {
-    const { _id, nom, prix, duree, commission } = request.body;
+    const { nom, prix, duree, commission, idCategorie, image } = request.body;
+    const _id = request.params.id
 
     try {
         const updateData = {
             nom: nom,
             prix: prix,
-            duree: duree,
             commission: commission,
+            duree: duree,
+            idCategorie: new ObjectId(idCategorie),
+            image: image,
         };
 
         const result = await updateDocument('service', _id, updateData);

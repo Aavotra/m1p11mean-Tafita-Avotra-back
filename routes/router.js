@@ -5,7 +5,7 @@ const controllerAuthentification = require("../controllers/controllerAuthentific
 const controllerInscription = require("../controllers/controllerInscription");
 const controllerUser = require("../controllers/controllerUser");
 const controllerEmploye = require("../controllers/controllerEmploye");
-
+const controllerCategorie = require("../controllers/controllerCategorie");
 
 
 const router = express.Router();
@@ -32,7 +32,12 @@ router.get('/listUser', controllerUser.listeUser);
 //crud service
 router.get('/listeService', controllerService.listeService);
 router.post('/insertService', controllerService.insertService);
-router.put('/updateService', controllerService.updateService);
+router.put('/updateService/:id', controllerService.updateService);
+
+//crud Categorie
+router.get('/listeCategorie', controllerCategorie.listeCategorie);
+router.post('/insertCategorie', controllerCategorie.insertCategorie);
+router.put('/updateCategorie/:id', controllerCategorie.updateCategorie);
 
 //login
 router.post('/login', controllerAuthentification.login);
