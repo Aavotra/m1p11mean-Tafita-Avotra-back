@@ -1,6 +1,7 @@
 const config = {
     development: {
         database: {
+
             url: 'mongodb://localhost:27017/',
             name: 'exam_salon'
         }
