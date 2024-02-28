@@ -1,22 +1,25 @@
+const url_connexion=process.env.MONGO_URI;
+const db_name=process.env.DB_NAME;
+
 const config = {
     development: {
         database: {
 //             url: 'mongodb://localhost:27017/',
-            url: 'mongodb+srv://root:root@cluster0.hatvqdw.mongodb.net/exam_salon',
-            name: 'exam_salon'
+            url: url_connexion,
+            name: db_name
         }
     },
     test: {
         database: {
 //             url: 'mongodb://localhost:27017/',
-            url: 'mongodb+srv://root:root@cluster0.hatvqdw.mongodb.net/exam_salon',
-            name: 'exam_salon'
+            url: url_connexion,
+            name: db_name
         }
     },
     production: {
         database: {
-            url: 'mongodb+srv://root:root@cluster0.hatvqdw.mongodb.net/exam_salon',
-            name: 'exam_salon'
+            url: url_connexion,
+            name: db_name
         }
     }
 };
