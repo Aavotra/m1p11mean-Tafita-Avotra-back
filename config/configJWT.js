@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 
-const secretKey = 'exam_salon_de_beaute';
+const secretKey = process.env.SECRET_KEY;
 
 // Middleware pour vérifier le token JWT
 const verifyToken = (request, response, next) => {
