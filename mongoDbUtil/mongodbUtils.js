@@ -64,17 +64,21 @@ async function createDocument(nomCollection, data) {
     const db = await connectToDatabase();
     const collection = db.collection(nomCollection);
     const result = await collection.insertOne(data);
-    return result;
+     return result;
 }
 
 //update
 async function updateDocument(nomCollection, collectionId, updatedData) {
-    const db = await connectToDatabase();
-    const collection = db.collection(nomCollection);
-    const result = await collection.updateOne({ _id: new ObjectId(collectionId) }, { $set: updatedData });
-    return result;
+    try {
+        const db = await connectToDatabase();
+        const collection = db.collection(nomCollection);
+        const result = await collection.updateOne({ _id: new ObjectId(collectionId) }, { $set: updatedData });
+        return result;
+    } catch (error) {
+        console.error("erreur_update",error);
+    }
+  
 }
-
 
 //delete
 async function deleteDocument(nomCollection, collectionId) {
@@ -147,7 +151,37 @@ async function getSoldeDispo(idClient) {
         throw error; // Renvoyer l'erreur pour qu'elle puisse être gérée à un niveau supérieur
     }
 }
-
+async function get_reste_a_payer()
+{
+    try {
+        const db = await connectToDatabase();
+        const collection = db.collection("rendezVous");
+        const document = await collection.aggregate([
+            {
+              $unwind: "$paiement" // Dérouler le tableau paiement
+            },
+            {
+              $group: {
+                _id: "$_id",
+                idClient: { $first: "$idClient" }, // Obtenir l'idClient pour chaque rendez-vous
+                prixTotal: { $first: "$prixTotal" }, // Obtenir le prixTotal pour chaque rendez-vous
+                totalPaiement: { $sum: "$paiement.montant" } // Somme des montants dans paiement pour chaque rendez-vous
+              }
+            },
+            {
+              $project: {
+                idClient: 1, // Inclure l'idClient dans le résultat
+                reste_a_payer: { $subtract: ["$prixTotal", "$totalPaiement"] } // Calculer la différence
+              }
+            }
+          ]);
+       // console.log(document);
+        return document;
+    } catch (error) {
+        console.error('Erreur lors de la recherche du document:', error);
+        throw error; // Renvoyer l'erreur pour qu'elle puisse être gérée à un niveau supérieur
+    }
+}
 module.exports = {
     createDocument,
     readDocuments,

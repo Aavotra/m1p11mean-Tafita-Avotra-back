@@ -62,6 +62,9 @@ const updateService = async function(request, response) {
             idCategorie: new ObjectId(idCategorie),
             image: image,
         };
+        console.log("l'id ",_id);
+        console.log("data ",updateData);
+
 
         const result = await updateDocument('service', _id, updateData);
         response.status(200).json({
@@ -69,7 +72,7 @@ const updateService = async function(request, response) {
             message: 'Changement du service avec succès',
             serviceId: result.modifiedCount > 0 ? _id : null
         });
-        
+        console.log("res",result.modifiedCount )
     } catch (error) {
         console.error('Erreur lors du changement d\'un service :', error);
         response.status(500).json({
