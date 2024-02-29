@@ -32,7 +32,7 @@ const login = async function(request, response) {
       employeId=employe._id;
       clientId=null;
     }
-    id(user.profil==2)
+    if(user.profil==2)
     {
       clientId=null;
       employeId=null;
