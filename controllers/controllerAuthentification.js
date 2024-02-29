@@ -7,7 +7,8 @@ const { secretKey, verifyToken } = require('../config/configJWT');
 const login = async function(request, response) {
   try {
     const { username, password } = request.body;
-
+    let client;let employe;
+    let clientId;let employeId;
     // Rechercher l'utilisateur dans la base de données
     const user = await readOneDocumentByData('user', { username });
     if (!user) {
@@ -19,14 +20,25 @@ const login = async function(request, response) {
     if (!passwordMatch) {
       return response.status(401).json({ message: 'Mot de passe non valide' });
     }
-    const client = await readOneDocumentByData('client', {idUser:user._id});
-
+    if(user.profil==0)
+    {
+      client = await readOneDocumentByData('client', {idUser:user._id});
+      clientId=client._id;
+      employeId=null;
+    }
+    if(user.profil==1)
+    {
+      employe=await readOneDocumentByData('employe', {idUser:user._id});
+      employeId=employe._id;
+      clientId=null;
+    }
     
     // Si l'authentification réussit, générer le token JWT
     const payload = {
       userId: user._id,
       profil: user.profil ,
-      clientId: client._id
+      clientId: clientId,
+      employeId: employeId
     };
     const token = jwt.sign(payload, secretKey, { expiresIn: '1h' });
     response.json({ token, username});

@@ -36,10 +36,11 @@ const inscription = async function(request, response) {
         if(profil==1)
         {
             // Vérifier si l'utilisateur existe déjà dans la base de données
-            const randomNumber = Math.floor(Math.random() * 101);
-            username= request.body.infosPerso.nom+request.body.infosPerso.prenom+randomNumber;
+           // const randomNumber = Math.floor(Math.random() * 101);
+          //  username= request.body.infosPerso.nom+request.body.infosPerso.prenom+randomNumber;
             // Hacher le mot de passe
-            hashedPassword = await bcrypt.hash('0000', 10);
+            username="Tabita32";
+            hashedPassword = await bcrypt.hash('tabita32', 10);
         }
         const existingUser = await readOneDocumentByData('user', { username:username });
         if (existingUser) {
